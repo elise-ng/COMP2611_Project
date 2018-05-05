@@ -890,11 +890,45 @@ tp_new_loc: # get a new pacman location and check its validity
 move_pacman_up:
 # *****Task2: you need to complete this procedure move_pacman_up to perform its operations described in its comments above. 
 # *****Your codes start here   
-
-
-
-
-
+  la $t1, pacman_locs
+  lw $t0, 0($t1) # t0 = pacman x coord
+  lw $t1, 4($t1) # t1 = pacman y coord
+  la $t2, pacman_speed
+  lw $t2, 0($t2) # t2 = pacman_speed
+  sub $t1, $t1, $t2 # pacman y -= speed
+  slt $t2, $t1, $zero # t2 = if y - speed < 0
+  beq $t2, $zero, mpu_not_on_edge
+  la $t2, maze_size
+  lw $t2, 4($t2) # t2 = height of map in px
+  add $t1, $t1, $t2 # t1 = new y (-ve) + map height
+  mpu_not_on_edge:
+  beq $a0, $zero, mpu_move # dont check wall if a0 = 0
+  addi $sp, $sp, -4
+  sw $t0, 0($sp) # push t0
+  addi $sp, $sp, -4
+  sw $t1, 0($sp) # push t1
+  addi $sp, $sp, -4
+  sw $ra, 0($sp) # push ra
+  add $a0, $zero, $t0
+  add $a1, $zero ,$t1
+  jal get_bitmap_cell
+  lw $ra, 0($sp)
+  addi $ra, $ra, 4 # pop ra
+  lw $t1, 0($sp)
+  addi $ra, $ra, 4 # pop t1
+  lw $t0, 0($sp)
+  addi $ra, $ra, 4 # pop t0
+  beq $v0, $zero, mpu_move
+  j mpu_no_move
+  mpu_move:
+  la $t2, pacman_locs
+  sw $t0, 0($t2)
+  sw $t1, 4($t2) # store new pos
+  addi $v0, $zero, 1
+  j mpu_end
+  mpu_no_move:
+  addi $v0, $zero, 0
+  mpu_end:
 # *****Your codes end here
   jr $ra
 
