@@ -423,7 +423,119 @@ gdl_exit:
 # For each cell containing value 0, create a score point object using syscall on its corresponding
 initialize_score_points:
 #*****Your codes start here
-  
+  # init values
+  la $t0, scorepoint_num
+  sw $zero, 0($t0)
+  la $t0, remaining_sp_num
+  sw $zero, 0($t0)
+  la $t0, total_score
+  sw $zero, 0($t0)
+  addi $t0, $zero, 0 # t0 = i = 0
+  isp_loop_clear_locs:
+  	seq $t1, $zero, 600
+  	beq $t0, $t1, isp_loop_clear_locs_end # exit if i = 600
+  	sll $t2, $t1, 2
+  	la $t3, scorepoint_locs
+  	add $t2, $t3, $t2 # t2 = addr scorepoint_locs[i]
+  	addi $t3, $zero, -1
+  	sw $t3, 0($t2) # scorepoint_locs[i] = -1
+  	addi $t0, $zero, 1 # i += 1
+  	j isp_loop_clear_locs
+  isp_loop_clear_locs_end:
+  addi $t0, $zero, 0 # t0 = i = 0
+  isp_loop_clear_sv:
+  	seq $t1, $zero, 300
+  	beq $t0, $t1, isp_loop_clear_sv_end # exit if i = 300
+  	sll $t2, $t1, 2
+  	la $t3, scorepoint_sv
+  	add $t2, $t3, $t2 # t2 = addr scorepoint_sv[i]
+  	sw $zero, 0($t2) # scorepoint_locs[i] = 0
+  	addi $t0, $zero, 1 # i += 1
+  	j isp_loop_clear_sv
+  isp_loop_clear_sv_end: 
+  la $t0, grid_row_num
+  lw $t0, 0($t0) # t0: grid_row_num
+  addi $t1, $zero, 0 # t1: i = 0
+  isp_loop_row:
+  	beq $t1, $t0, isp_loop_row_end # exit loop if i == grid_row_num
+  	la $t8, grid_col_num
+  	lw $t8, 0($t8) # $ t8 = grid_col_num
+  	addi $t9, $zero, 0 # t9: j = 0
+  	isp_loop_col:
+  		beq $t9, $t8, isp_loop_col_end # exit loop if j == grid_col_num
+  		# check if cell empty
+  		mult $t1, $t8 # i * col_num
+  		mflo $t2 # t2 = i * col_num
+  		add $t2, $t2, $t9 # t2 = i * col_num + j
+  		la $t3, maze_bitmap
+  		add $t3, $t3, $t2 # t3 = addr maze_bitmap + i * col_num + j
+  		lb $t4, 0($t3) # t4 = maze_bitmap[i * col_num + j]
+  		addi $t5, $zero, 1
+  		beq $t4, $t5, isp_loop_col_cell_not_empty
+  		# create object
+  		# calculate id
+  		la $t3, scorepoint_base
+  		lw $t3, 0($t3) # t3 = scorepoint_base
+  		la $t4, scorepoint_num # t4 = addr scorepoint_num
+  		lw $t5, 0($t4) # t5 = scorepoint_num
+  		add $a0, $t3, $t5  # id = scorepoint_base + scorepoint_num
+  		# calculate coord, update scorepoint_locs
+  		la $t5, grid_cell_size # t5 = addr grid_cell_size
+  		lw $t6, 0($t5) # t6 = cell width
+  		mult $t9, $t6
+  		mflo $t2 # t2 = x coord
+  		lw $t5, 4($t5) # t5 = cell height
+  		mult $t1, $t5 # i * height
+  		mflo $t3 # t3 = y coord
+  		add $a1, $zero, $t2 # a1 = x coord
+  		add $a2, $zero, $t3 # a2 = y coord
+  		la $t2, scorepoint_num
+  		lw $t2, 0($t2) # t2 = scorepoint_num
+  		sll $t4, $t2, 3 # t4 = (k * 2) * 4
+  		la $t5, scorepoint_locs
+  		add $t4, $t5, $t4 # t4 = addr scorepoint_locs[k*2]
+  		sw $a1, 0($t4) # scorepoint_locs[k*2] = x coord
+  		sll $t2, $t2, 1 # t2 = k * 2
+  		addi $t2, $t2, 1 # t2 = k * 2 + 1
+  		sll $t2, $t2, 2 # t2 = (k * 2 + 1) * 4
+  		la $t3, scorepoint_locs
+  		add $t2, $t3, $t2 # t2 = addr scorepoint_locs[k*2+1]
+  		sw $a2, 0($t2) # scorepoint_locs[k*2+1] = y coord
+  		# syscall
+  		addi $a3, $zero, 0 # type = 0 (score point)
+  		addi $v0, $zero, 205
+  		syscall
+  		# update total_score
+  		la $t2, total_score # t2 = addr total_score
+  		lw $t3, 0($t2) # t3 = total_score
+  		add $t3, $t3, $v0 # t3 = total_score + new object score
+  		sw $t3, 0($t2)
+  		# update scorepoint_sv
+  		la $t2, scorepoint_num
+  		lw $t2, 0($t2) # t2 = scorepoint_num
+  		sll $t2, $t2, 2 # t2 = scorepoint_num * 4
+  		la $t3, scorepoint_sv
+  		add $t2, $t3, $t2 # t2 = addr scorepoint_sv[scorepoint_num]
+  		sw $v0, 0($t2) # scorepoint_sv[scorepoint_num] = new object score
+  		# update scorepoint_num
+  		la $t2, scorepoint_num
+  		lw $t3, 0($t2)
+  		addi $t3, $t3, 1
+  		sw $t3, 0($t2) # scorepoint_num += 1
+  		# update remaining_sp_num
+  		la $t2, remaining_sp_num
+  		lw $t3, 0($t2)
+  		addi $t3, $t3, 1
+  		sw $t3, 0($t2) # remaining_sp_num += 1
+  		isp_loop_col_cell_not_empty:
+  		# j += 1
+  		addi $t9, $t9, 1
+  		j isp_loop_col
+  	isp_loop_col_end:
+  	# i += 1
+  	addi $t1, $t1, 1
+  	j isp_loop_row
+  isp_loop_row_end:
 # *****Your codes end here
   jr $ra
 
