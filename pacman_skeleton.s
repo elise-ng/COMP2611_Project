@@ -1234,16 +1234,38 @@ check_intersection:
 #          condition4: whether RectA's bottom edge is above RectB's top edge.
 # Thirdly, set the value of $v0 based on the check result. Then: jr $ra 
 #*****Your codes start here
-
+  lw $t7, 0($sp) # t7 = B.y2
+  addi $sp, $sp, 4
+  lw $t6, 0($sp) # t6 = B.x2
+  addi $sp, $sp, 4
+  lw $t5, 0($sp) # t5 = B.y1
+  addi $sp, $sp, 4
+  lw $t4, 0($sp) # t4 = B.x1
+  addi $sp, $sp, 4
+  lw $t3, 0($sp) # t3 = A.y2
+  addi $sp, $sp, 4
+  lw $t2, 0($sp) # t2 = A.x2
+  addi $sp, $sp, 4
+  lw $t1, 0($sp) # t1 = A.y1
+  addi $sp, $sp, 4
+  lw $t0, 0($sp) # t0 = A.x1
+  addi $sp, $sp, 4
   # condition1: whether A's left edge is to the right of B's right edge,
-  
+  bge $t0, $t6, ci_false # A.x1 >= B.x2
   # condition2: whether A's right edge is to the left of B's left edge,
-  
+  ble $t2, $t4, ci_false # A.x2 <= B.x1
   # condition3: whether A's top edge is below B's bottom edge,
-  
+  bge $t1, $t7, ci_false # A.y1 >= B.y2
   # conditon4: whether A's bottom edge is above B's top edge,
-  
-
+  ble $t3, $t5, ci_false # A.y2 <= B.y1
+  ci_true:
+  addi $v0, $zero, 1
+  j ci_end
+  ci_false:
+  addi $v0, $zero, 0
+  j ci_end
+  ci_end:
+  jr $ra
 #*****Your codes end here
 
 
