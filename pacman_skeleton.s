@@ -1495,9 +1495,37 @@ cgc_be: beq $s0, $zero, cgc_no_collision # whether num <= 0
 # | RectB.botrigh_x |
 # | RectB.botrigh_y | <-- $sp 
 # *****Your codes start here
-    
-  
-  
+  addi $sp, $sp, -4
+  sw $ra, 0($sp) # push sp
+  # A = pacman
+  addi $sp, $sp, -4
+  sw $t0, 0($sp) # push t0 = pacman x1
+  addi $sp, $sp, -4
+  sw $t1, 0($sp) # push t1 = pacman y1
+  add $t0, $t0, $s6
+  addi $t0, $t0, -1 # t0 = pacman x2 = x1 + width - 1
+  add $t1, $t1, $s7
+  addi $t1, $t1, -1 # t1 = pacman y2 = y1 + height - 1
+  addi $sp, $sp, -4
+  sw $t0, 0($sp) # push t0 = pacman x2
+  addi $sp, $sp, -4
+  sw $t1, 0($sp) # push t1 = pacman y2
+  # B = score point
+  addi $sp, $sp, -4
+  sw $t2, 0($sp) # push t6 = ghost x1
+  addi $sp, $sp, -4
+  sw $t3, 0($sp) # push t7 = ghost y1
+  add $t2, $t2, $s3
+  addi $t2, $t2, -1 # t6 = ghost x2 = x1 + width - 1
+  add $t3, $t3, $s4
+  addi $t3, $t3, -1 # t7 = ghost y2 = y2 + hieght - 1
+  addi $sp, $sp, -4
+  sw $t2, 0($sp) # push t6 = ghost x2
+  addi $sp, $sp, -4
+  sw $t3, 0($sp) # push t7 = ghost y2
+  jal check_intersection
+  lw $ra, 0($sp)
+  addi $sp, $sp, 4 # pop ra
 # *****Your codes end here
 
   # After calling procedure: check_intersection, $v0=0 if the pacman missed the ghost object
