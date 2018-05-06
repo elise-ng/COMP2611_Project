@@ -954,16 +954,21 @@ move_pacman_down:
 # *****Task3: you need to complete this procedure move_pacman_down to perform its operations described in its comments above. 
 # *****Your codes start here
   la $t1, pacman_locs
-  lw $t0, 0($t1) # t0 = pacman x coord
-  lw $t1, 4($t1) # t1 = pacman y coord
-  la $t2, pacman_speed
-  lw $t2, 0($t2) # t2 = pacman_speed
-  add $t1, $t1, $t2 # pacman y += speed
-  la $t2, maze_size
-  lw $t2, 4($t2) # t2 = height of map in px
-  sgt $t3, $t1, $t2 # t3 = if y + speed > map height
-  beq $t3, $zero, mpd_not_on_edge
-  sub $t1, $t1, $t3 # t1 = new y - map height
+  lw $t0, 0($t1) # t0 = pacman x1 coord
+  lw $t1, 4($t1) # t1 = pacman y1 coord
+  la $t2, pacman_size
+  lw $t2, 0($t2)
+  add $t2, $t1, $t2 # t2 = pacman y2 coord
+  la $t3, pacman_speed
+  lw $t3, 0($t3) # t3 = pacman_speed
+  add $t1, $t1, $t3 # pacman y1 += speed
+  add $t2, $t2, $t3 # pacman y2 += speed
+  la $t3, maze_size
+  lw $t3, 4($t3) # t3 = height of map in px
+  sgt $t4, $t2, $t3 # t4 = if y2 + speed > map height
+  beq $t4, $zero, mpd_not_on_edge
+  sub $t1, $t1, $t3 # t1 = y1 - map height
+  sub $t2, $t2, $t3 # t2 = y2 - map height
   mpd_not_on_edge:
   beq $a0, $zero, mpd_move # dont check wall if a0 = 0
   addi $sp, $sp, -4
@@ -971,12 +976,16 @@ move_pacman_down:
   addi $sp, $sp, -4
   sw $t1, 0($sp) # push t1
   addi $sp, $sp, -4
+  sw $t2, 0($sp) # push t2
+  addi $sp, $sp, -4
   sw $ra, 0($sp) # push ra
   add $a0, $zero, $t0
-  add $a1, $zero ,$t1
+  add $a1, $zero ,$t2
   jal get_bitmap_cell
   lw $ra, 0($sp)
   addi $sp, $sp, 4 # pop ra
+  lw $t2, 0($sp)
+  addi $sp, $sp, 4 # pop t1
   lw $t1, 0($sp)
   addi $sp, $sp, 4 # pop t1
   lw $t0, 0($sp)
