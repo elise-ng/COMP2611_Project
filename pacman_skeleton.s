@@ -921,9 +921,13 @@ move_pacman_up:
   beq $v0, $zero, mpu_move
   j mpu_no_move
   mpu_move:
-  la $t2, pacman_locs
-  sw $t0, 0($t2)
-  sw $t1, 4($t2) # store new pos
+  la $t2, pacman_id
+  lw $a0, 0($t2) # a0 = pacman_id
+  add $a1, $zero, $t0 # a1 = x coord
+  add $a2, $zero, $t1 # a2 = y coord
+  addi $a3, $zero, 1 # a3 = 1 : pacman
+  addi $v0, $zero, 206
+  syscall # update location of pacman
   addi $v0, $zero, 1
   j mpu_end
   mpu_no_move:
