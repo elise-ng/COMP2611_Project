@@ -1354,11 +1354,11 @@ csc_be: beq $s0, $zero, csc_exit # whether num <= 0
   add $t6, $t6, $s3
   addi $t6, $t6, -1 # t6 = score point x2 = x1 + width - 1
   add $t7, $t7, $s4
-  addi $t7, $t7, -1 # t7 = pacman y2 = y2 + hieght - 1
+  addi $t7, $t7, -1 # t7 = score point y2 = y2 + hieght - 1
   addi $sp, $sp, -4
-  sw $t6, 0($sp) # push t6 = pacman x2
+  sw $t6, 0($sp) # push t6 = score point x2
   addi $sp, $sp, -4
-  sw $t7, 0($sp) # push t7 = pacman y2
+  sw $t7, 0($sp) # push t7 = score point y2
   jal check_intersection
   lw $ra, 0($sp)
   addi $sp, $sp, 4 # pop ra
