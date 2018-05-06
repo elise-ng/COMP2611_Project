@@ -1331,9 +1331,9 @@ csc_be: beq $s0, $zero, csc_exit # whether num <= 0
 # | RectB.botrigh_x |
 # | RectB.botrigh_y | <-- $sp 
 # *****Your codes start here
-  # A = pacman
   addi $sp, $sp, -4
   sw $ra, 0($sp) # push sp
+  # A = pacman
   addi $sp, $sp, -4
   sw $t0, 0($sp) # push t0 = pacman x1
   addi $sp, $sp, -4
