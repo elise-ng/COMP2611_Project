@@ -896,7 +896,7 @@ move_pacman_up:
   la $t2, pacman_speed
   lw $t2, 0($t2) # t2 = pacman_speed
   sub $t1, $t1, $t2 # pacman y -= speed
-  slt $t2, $t1, $zero # t2 = if y - speed < 0
+  slt $t2, $t1, $zero # t2 = if y < 0
   beq $t2, $zero, mpu_not_on_edge
   la $t2, maze_size
   lw $t2, 4($t2) # t2 = height of map in px
@@ -918,9 +918,12 @@ move_pacman_up:
   addi $sp, $sp, 4 # pop t1
   lw $t0, 0($sp)
   addi $sp, $sp, 4 # pop t0
-  beq $v0, $zero, mpu_move
+  beq $v0, $zero, mpu_move # v0 = value of cell, move if 0
   j mpu_no_move
   mpu_move:
+  la $t2, pacman_locs
+  sw $t0, 0($t2)
+  sw $t1, 4($t2) # store new pos
   la $t2, pacman_id
   lw $a0, 0($t2) # a0 = pacman_id
   add $a1, $zero, $t0 # a1 = x coord
@@ -984,6 +987,13 @@ move_pacman_down:
   la $t2, pacman_locs
   sw $t0, 0($t2)
   sw $t1, 4($t2) # store new pos
+  la $t2, pacman_id
+  lw $a0, 0($t2) # a0 = pacman_id
+  add $a1, $zero, $t0 # a1 = x coord
+  add $a2, $zero, $t1 # a2 = y coord
+  addi $a3, $zero, 1 # a3 = 1 : pacman
+  addi $v0, $zero, 206
+  syscall # update location of pacman
   addi $v0, $zero, 1
   j mpd_end
   mpd_no_move:
