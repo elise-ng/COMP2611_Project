@@ -913,11 +913,11 @@ move_pacman_up:
   add $a1, $zero ,$t1
   jal get_bitmap_cell
   lw $ra, 0($sp)
-  addi $ra, $ra, 4 # pop ra
+  addi $sp, $sp, 4 # pop ra
   lw $t1, 0($sp)
-  addi $ra, $ra, 4 # pop t1
+  addi $sp, $sp, 4 # pop t1
   lw $t0, 0($sp)
-  addi $ra, $ra, 4 # pop t0
+  addi $sp, $sp, 4 # pop t0
   beq $v0, $zero, mpu_move
   j mpu_no_move
   mpu_move:
@@ -969,11 +969,11 @@ move_pacman_down:
   add $a1, $zero ,$t1
   jal get_bitmap_cell
   lw $ra, 0($sp)
-  addi $ra, $ra, 4 # pop ra
+  addi $sp, $sp, 4 # pop ra
   lw $t1, 0($sp)
-  addi $ra, $ra, 4 # pop t1
+  addi $sp, $sp, 4 # pop t1
   lw $t0, 0($sp)
-  addi $ra, $ra, 4 # pop t0
+  addi $sp, $sp, 4 # pop t0
   beq $v0, $zero, mpd_move
   j mpd_no_move
   mpd_move:
